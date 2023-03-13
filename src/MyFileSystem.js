@@ -12,8 +12,8 @@ class MyFileSystem {
     }
     return JSON.parse(fs.readFileSync(mpath, "utf-8"));
   }
-  static join(path) {
-    return path.join(__dirname, path);
+  static join(mpath) {
+    return path.join(__dirname, mpath);
   }
 }
 

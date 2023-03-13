@@ -1,25 +1,7 @@
 const express = require("express");
-const fs = require("fs");
 const config = require("./config");
-const Manager = require("./src/Manager");
-const MyFileSystem = require("./src/MyFileSystem");
 const Message = require("./src/Message");
-const TableTime = require("./src/TableTime");
 const app = express();
-
-const mgUser = new Manager(
-  MyFileSystem.read(MyFileSystem.join("./src/data/managerUser.json"))
-);
-
-const mgTableTime = new Manager();
-
-for (let id of mgUser.getListId()) {
-  if (!mgTableTime.has(id)) {
-    const tb = new TableTime(mgUser.get(id));
-    await tb.getNow(id);
-    tb.autoStoreData(30);
-  }
-}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

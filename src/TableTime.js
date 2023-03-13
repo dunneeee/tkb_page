@@ -1,13 +1,8 @@
 const axios = require("axios");
 const { parse } = require("node-html-parser");
-const { join } = require("path");
-const fs = require("fs");
 class TableTime {
   constructor(cookie) {
     this.cookie = cookie;
-    this.path = null;
-    this.fileName = null;
-    this.autoID = null;
   }
   async getHTML() {
     try {
@@ -165,7 +160,6 @@ class TableTime {
         datas: t,
       };
     }
-    console.log(JSON.stringify(result, null, 2));
     return [days.map((e) => e.day), result];
   }
 
@@ -179,42 +173,6 @@ class TableTime {
     const html = await this.getHTML();
     if (!html) return null;
     return this.formatData(this.getData(html));
-  }
-  async storeData(fileName) {
-    const path = join(__dirname, "./data", fileName + ".json");
-    this.path = path;
-    const data = await this.callData();
-    if (data) {
-      fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
-    }
-  }
-
-  autoStoreData(delay = 30) {
-    if (!this.cookie) return;
-    const time = delay * 60000;
-    this.autoID = setInterval(() => {
-      console.log("interval starting!");
-      this.callData()
-        .then((data) => {
-          if (data) {
-            fs.writeFileSync(this.path, JSON.stringify(data, null, 2), "utf-8");
-          }
-        })
-        .catch((e) => console.log(e));
-    }, time);
-  }
-  stopAutoStoreData() {
-    clearInterval(this.autoID);
-  }
-
-  async getNow(id) {
-    if (!this.cookie) return;
-    if (this.path == null || !fs.existsSync(this.path)) {
-      const data = await this.callData();
-      this.storeData(id, data);
-      return data;
-    }
-    return JSON.parse(fs.readFileSync(this.path, "utf-8"));
   }
 }
 
